@@ -1,0 +1,6 @@
+{
+  "name": "BeliefCraft - Self Development & Life Quality Coach",
+  "description": "A self-development platform to strengthen self-belief, elevate life quality, dismantle limiting thoughts, and grow with an intelligent AI mindset mentor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
