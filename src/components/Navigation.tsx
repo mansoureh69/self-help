@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import {
   LayoutDashboard,
   BotMessageSquare,
@@ -6,8 +7,11 @@ import {
   Sparkles,
   PieChart,
   CheckCircle2,
-  Flame
+  Flame,
+  Activity
 } from 'lucide-react';
+import { AnimatedCounter } from './ui/AnimatedCounter';
+import { SPRINGS } from '../styles/tokens';
 
 export type TabType = 'overview' | 'coach' | 'reframer' | 'evidence' | 'life-wheel' | 'rituals';
 
@@ -26,38 +30,48 @@ export const Navigation: React.FC<NavigationProps> = ({
 }) => {
   const tabs = [
     { id: 'overview' as TabType, label: 'Overview', icon: LayoutDashboard },
-    { id: 'coach' as TabType, label: 'AI Mindset Coach', icon: BotMessageSquare, badge: 'Gemini' },
-    { id: 'reframer' as TabType, label: 'Cognitive Reframer', icon: Sparkles },
+    { id: 'coach' as TabType, label: 'Mindset Coach', icon: BotMessageSquare, badge: 'AI' },
+    { id: 'reframer' as TabType, label: 'Reframer', icon: Sparkles },
     { id: 'evidence' as TabType, label: 'Evidence Locker', icon: ShieldCheck },
-    { id: 'life-wheel' as TabType, label: 'Life Quality Wheel', icon: PieChart },
+    { id: 'life-wheel' as TabType, label: 'Life Wheel', icon: PieChart },
     { id: 'rituals' as TabType, label: 'Daily Anchors', icon: CheckCircle2 },
   ];
 
   return (
-    <header className="sticky top-0 z-30 bg-stone-900/95 backdrop-blur-md border-b border-stone-800 text-stone-100 transition-all">
+    <header className="sticky top-0 z-40 bg-[#08090a]/80 backdrop-blur-2xl border-b border-white/[0.07] text-stone-100 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo & Name */}
-          <div
-            className="flex items-center gap-3 cursor-pointer group"
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center gap-3 cursor-pointer group select-none"
             onClick={() => onSelectTab('overview')}
             id="brand-logo"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-amber-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-amber-900/20 group-hover:scale-105 transition-transform">
-              <Sparkles className="w-5 h-5 text-stone-950 stroke-[2.5]" />
+            <div className="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-emerald-400 p-[1px] shadow-lg shadow-amber-950/20">
+              <div className="w-full h-full bg-[#0d1017] rounded-[11px] flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+              </div>
             </div>
             <div>
-              <span className="text-xl font-bold tracking-tight text-stone-100 font-['Outfit']">
+              <span className="text-base sm:text-lg font-extrabold tracking-tight text-white font-['Outfit'] flex items-center gap-1">
                 Belief<span className="text-amber-400">Craft</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 font-sans font-semibold ml-1">
+                  2.0
+                </span>
               </span>
-              <p className="text-[11px] text-stone-400 font-medium tracking-wide uppercase">
+              <p className="text-[10px] text-stone-400 font-medium tracking-wide uppercase">
                 Life Quality & Self-Belief
               </p>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1.5" aria-label="Main Navigation">
+          {/* Desktop Floating Pill Navigation */}
+          <nav
+            className="hidden md:flex items-center bg-[#10131a]/90 p-1.5 rounded-2xl border border-white/[0.08] shadow-inner"
+            aria-label="Main Navigation"
+          >
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -66,51 +80,66 @@ export const Navigation: React.FC<NavigationProps> = ({
                   key={tab.id}
                   id={`nav-btn-${tab.id}`}
                   onClick={() => onSelectTab(tab.id)}
-                  className={`relative flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-                    isActive
-                      ? 'bg-stone-800 text-amber-300 shadow-sm'
-                      : 'text-stone-300 hover:text-stone-100 hover:bg-stone-800/60'
+                  className={`relative flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-200 select-none ${
+                    isActive ? 'text-stone-950' : 'text-stone-300 hover:text-white'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-amber-400' : 'text-stone-400'}`} />
-                  <span>{tab.label}</span>
-                  {tab.badge && (
-                    <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                      {tab.badge}
-                    </span>
-                  )}
+                  {/* Morphing Active Pill Background */}
                   {isActive && (
-                    <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-amber-400 rounded-full" />
+                    <motion.div
+                      layoutId="active-nav-pill"
+                      transition={SPRINGS.snappy}
+                      className="absolute inset-0 bg-gradient-to-r from-amber-400 to-amber-500 rounded-xl shadow-md shadow-amber-500/25"
+                    />
                   )}
+
+                  <span className="relative z-10 flex items-center gap-1.5">
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{tab.label}</span>
+                    {tab.badge && (
+                      <span
+                        className={`text-[9px] px-1.5 py-0.2 rounded-full font-bold uppercase ${
+                          isActive
+                            ? 'bg-stone-950/20 text-stone-950'
+                            : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                        }`}
+                      >
+                        {tab.badge}
+                      </span>
+                    )}
+                  </span>
                 </button>
               );
             })}
           </nav>
 
-          {/* User Vitals Badges */}
-          <div className="flex items-center gap-2.5">
-            <div
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-800 border border-stone-700/80 text-xs font-medium text-amber-300"
-              title="Consecutive Days of Active Growth"
+          {/* Vital Badges (Streak & Live Quality Score with Animated Counters) */}
+          <div className="flex items-center gap-2">
+            <motion.div
+              whileHover={{ scale: 1.04 }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#12161f] border border-amber-500/20 text-xs font-semibold text-amber-300 shadow-sm"
+              title="Consecutive Days of Empirical Growth"
               id="streak-badge"
             >
               <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-              <span>{streakCount}d streak</span>
-            </div>
+              <AnimatedCounter value={streakCount} suffix="d" />
+            </motion.div>
 
-            <div
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-xs font-medium text-emerald-300"
-              title="Overall Life Quality Score (out of 100)"
+            <motion.div
+              whileHover={{ scale: 1.04 }}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0d1815] border border-emerald-500/25 text-xs font-semibold text-emerald-300 shadow-sm"
+              title="Overall Life Quality Equilibrium Index"
               id="life-quality-badge"
             >
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>LQ: {lifeQualityScore}%</span>
-            </div>
+              <Activity className="w-3.5 h-3.5 text-emerald-400" />
+              <span>LQ:</span>
+              <AnimatedCounter value={lifeQualityScore} suffix="%" className="font-bold text-white" />
+            </motion.div>
           </div>
         </div>
 
-        {/* Mobile Navigation Bar */}
-        <div className="flex md:hidden overflow-x-auto py-2 gap-1 scrollbar-none border-t border-stone-800/80">
+        {/* Mobile Navigation Scroll */}
+        <div className="flex md:hidden overflow-x-auto py-2 gap-1.5 scrollbar-none border-t border-white/[0.06]">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -118,10 +147,10 @@ export const Navigation: React.FC<NavigationProps> = ({
               <button
                 key={tab.id}
                 onClick={() => onSelectTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors select-none ${
                   isActive
-                    ? 'bg-stone-800 text-amber-400 font-semibold'
-                    : 'text-stone-400 hover:text-stone-200'
+                    ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
+                    : 'text-stone-300 hover:text-white bg-[#10131a] border border-white/[0.06]'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />

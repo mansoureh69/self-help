@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Navigation, TabType } from './components/Navigation';
 import { OverviewHome } from './components/Dashboard/OverviewHome';
 import { CoachChat } from './components/Chat/CoachChat';
@@ -15,6 +16,7 @@ import {
   COACH_PERSONAS,
 } from './data/initialData';
 import { CoachPersona, DailyRitual, EvidenceEntry, LimitingBelief, LifeQualityPillar, LifeQualityCheckpoint } from './types';
+import { SPRINGS } from './styles/tokens';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -98,6 +100,10 @@ export default function App() {
   }, [pillars]);
 
   useEffect(() => {
+    localStorage.setItem('beliefcraft_checkpoints', JSON.stringify(checkpoints));
+  }, [checkpoints]);
+
+  useEffect(() => {
     localStorage.setItem('beliefcraft_evidence', JSON.stringify(evidence));
   }, [evidence]);
 
@@ -113,67 +119,17 @@ export default function App() {
     localStorage.setItem('beliefcraft_streak', String(streakCount));
   }, [streakCount]);
 
-  useEffect(() => {
-    localStorage.setItem('beliefcraft_checkpoints', JSON.stringify(checkpoints));
-  }, [checkpoints]);
-
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
 
   // Handlers
-  const handleAddCheckpoint = (note: string) => {
-    const currentTotal = pillars.reduce((sum, p) => sum + p.score, 0);
-    const currentOverall = Math.round((currentTotal / (pillars.length * 10)) * 100);
-    const pillarsMap: Record<string, number> = {};
-    pillars.forEach((p) => {
-      pillarsMap[p.id] = p.score;
-    });
-
-    const newCheckpoint: LifeQualityCheckpoint = {
-      id: `chk-${Date.now()}`,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      overallScore: currentOverall,
-      pillars: pillarsMap,
-      reflectionNote: note,
-    };
-
-    setCheckpoints((prev) => [...prev, newCheckpoint]);
-    showToast('📈 Milestone checkpoint saved to Growth Trends!');
-  };
-
-  const handleAddEvidence = (entry: Omit<EvidenceEntry, 'id'>) => {
-    const newEntry: EvidenceEntry = {
-      ...entry,
-      id: `ev-${Date.now()}`,
-    };
-    setEvidence((prev) => [newEntry, ...prev]);
-    showToast('✨ New capability proof deposited in your Evidence Locker!');
-  };
-
-  const handleDeleteEvidence = (id: string) => {
-    setEvidence((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const handleAddReframe = (reframe: LimitingBelief) => {
-    setReframes((prev) => [reframe, ...prev]);
-    showToast('🛡️ Limiting thought reframed into grounded self-belief!');
-  };
-
-  const handleToggleAction = (id: string) => {
-    setReframes((prev) =>
-      prev.map((r) =>
-        r.id === id ? { ...r, actionCompleted: !r.actionCompleted } : r
-      )
-    );
-    showToast('⭐ Micro-action step updated!');
-  };
-
   const handleUpdatePillarScore = (pillarId: string, newScore: number) => {
     setPillars((prev) =>
       prev.map((p) => (p.id === pillarId ? { ...p, score: newScore } : p))
     );
+    showToast('✨ Pillar score calibrated.');
   };
 
   const handleSaveBoostPlan = (
@@ -183,13 +139,65 @@ export default function App() {
     setPillars((prev) =>
       prev.map((p) => (p.id === pillarId ? { ...p, boostPlan: plan } : p))
     );
-    showToast('🚀 Custom elevation plan ready for this life domain!');
+    showToast('🚀 Custom elevation plan activated!');
   };
 
-  const handleToggleRitual = (id: string) => {
+  const handleAddEvidence = (entry: Omit<EvidenceEntry, 'id'>) => {
+    const newEntry: EvidenceEntry = {
+      id: `ev-${Date.now()}`,
+      ...entry,
+    };
+    setEvidence((prev) => [newEntry, ...prev]);
+    showToast('🛡️ Undeniable proof deposited in Locker!');
+  };
+
+  const handleDeleteEvidence = (id: string) => {
+    setEvidence((prev) => prev.filter((e) => e.id !== id));
+    showToast('Proof entry removed.');
+  };
+
+  const handleAddReframe = (reframe: LimitingBelief) => {
+    setReframes((prev) => [reframe, ...prev]);
+    showToast('💡 Inner critic distortion dismantled & reframed!');
+  };
+
+  const handleToggleAction = (reframeId: string) => {
+    setReframes((prev) =>
+      prev.map((r) =>
+        r.id === reframeId ? { ...r, actionCompleted: !r.actionCompleted } : r
+      )
+    );
+    showToast('🎯 Micro-action status updated!');
+  };
+
+  const handleAddCheckpoint = (note: string) => {
+    const totalScore = pillars.reduce((sum, p) => sum + p.score, 0);
+    const overallScore = Math.round((totalScore / (pillars.length * 10)) * 100);
+
+    const pillarsMap: Record<string, number> = {};
+    pillars.forEach((p) => {
+      pillarsMap[p.id] = p.score;
+    });
+
+    const now = new Date();
+    const dateFormatted = `${now.toLocaleString('default', { month: 'short' })} ${now.getDate()}`;
+
+    const newCheckpoint: LifeQualityCheckpoint = {
+      id: `chk-${Date.now()}`,
+      date: dateFormatted,
+      overallScore,
+      pillars: pillarsMap,
+      reflectionNote: note,
+    };
+
+    setCheckpoints((prev) => [...prev, newCheckpoint]);
+    showToast('📈 Milestone checkpoint saved to Growth Trends!');
+  };
+
+  const handleToggleRitual = (ritualId: string) => {
     setRituals((prev) =>
       prev.map((r) => {
-        if (r.id === id) {
+        if (r.id === ritualId) {
           const nextCompleted = !r.completedToday;
           return {
             ...r,
@@ -223,13 +231,21 @@ export default function App() {
   const lifeQualityPercent = Math.round((totalScore / (pillars.length * 10)) * 100);
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-['Plus_Jakarta_Sans'] selection:bg-amber-500 selection:text-stone-950">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-stone-900 border-2 border-amber-500/80 text-amber-300 text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl animate-in slide-in-from-bottom-3 duration-200 flex items-center gap-2">
-          <span>{toastMessage}</span>
-        </div>
-      )}
+    <div className="min-h-screen bg-[#08090a] text-stone-100 flex flex-col font-['Plus_Jakarta_Sans'] selection:bg-amber-400 selection:text-stone-950 ambient-glow-mesh relative">
+      {/* Toast Notification with Spring Physics */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={SPRINGS.snappy}
+            className="fixed bottom-6 right-6 z-50 bg-[#121622]/95 border border-amber-500/60 text-amber-300 text-xs font-semibold px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-xl flex items-center gap-2"
+          >
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Navigation Bar */}
       <Navigation
@@ -241,62 +257,116 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 pb-16">
-        {activeTab === 'overview' && (
-          <OverviewHome
-            onNavigate={setActiveTab}
-            onSelectCoachPersona={handleSelectCoachPersona}
-            pillars={pillars}
-            evidence={evidence}
-            reframes={reframes}
-            rituals={rituals}
-            streakCount={streakCount}
-            checkpoints={checkpoints}
-            onAddCheckpoint={handleAddCheckpoint}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {activeTab === 'overview' && (
+            <motion.div
+              key="overview"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={SPRINGS.gentle}
+            >
+              <OverviewHome
+                onNavigate={setActiveTab}
+                onSelectCoachPersona={handleSelectCoachPersona}
+                pillars={pillars}
+                evidence={evidence}
+                reframes={reframes}
+                rituals={rituals}
+                streakCount={streakCount}
+                checkpoints={checkpoints}
+                onAddCheckpoint={handleAddCheckpoint}
+              />
+            </motion.div>
+          )}
 
-        {activeTab === 'coach' && (
-          <CoachChat onSaveInsightToEvidence={handleAddEvidence} />
-        )}
+          {activeTab === 'coach' && (
+            <motion.div
+              key="coach"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={SPRINGS.gentle}
+            >
+              <CoachChat onSaveInsightToEvidence={handleAddEvidence} />
+            </motion.div>
+          )}
 
-        {activeTab === 'reframer' && (
-          <CognitiveReframer
-            reframes={reframes}
-            onAddReframe={handleAddReframe}
-            onToggleAction={handleToggleAction}
-          />
-        )}
+          {activeTab === 'reframer' && (
+            <motion.div
+              key="reframer"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={SPRINGS.gentle}
+            >
+              <CognitiveReframer
+                reframes={reframes}
+                onAddReframe={handleAddReframe}
+                onToggleAction={handleToggleAction}
+              />
+            </motion.div>
+          )}
 
-        {activeTab === 'evidence' && (
-          <EvidenceLocker
-            evidence={evidence}
-            onAddEvidence={handleAddEvidence}
-            onDeleteEvidence={handleDeleteEvidence}
-          />
-        )}
+          {activeTab === 'evidence' && (
+            <motion.div
+              key="evidence"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={SPRINGS.gentle}
+            >
+              <EvidenceLocker
+                evidence={evidence}
+                onAddEvidence={handleAddEvidence}
+                onDeleteEvidence={handleDeleteEvidence}
+              />
+            </motion.div>
+          )}
 
-        {activeTab === 'life-wheel' && (
-          <LifeQualityWheel
-            pillars={pillars}
-            onUpdateScore={handleUpdatePillarScore}
-            onSaveBoostPlan={handleSaveBoostPlan}
-          />
-        )}
+          {activeTab === 'life-wheel' && (
+            <motion.div
+              key="life-wheel"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={SPRINGS.gentle}
+            >
+              <LifeQualityWheel
+                pillars={pillars}
+                onUpdateScore={handleUpdatePillarScore}
+                onSaveBoostPlan={handleSaveBoostPlan}
+              />
+            </motion.div>
+          )}
 
-        {activeTab === 'rituals' && (
-          <DailyAnchorRituals
-            rituals={rituals}
-            onToggleRitual={handleToggleRitual}
-            onAddRitual={handleAddRitual}
-          />
-        )}
+          {activeTab === 'rituals' && (
+            <motion.div
+              key="rituals"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={SPRINGS.gentle}
+            >
+              <DailyAnchorRituals
+                rituals={rituals}
+                onToggleRitual={handleToggleRitual}
+                onAddRitual={handleAddRitual}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-stone-800/80 py-6 text-center text-xs text-stone-500">
+      {/* 21st.dev Footer */}
+      <footer className="border-t border-white/[0.06] py-7 text-center text-xs text-stone-500 bg-[#08090a]/80 backdrop-blur-xl">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>BeliefCraft • Grounded Self-Belief & Holistic Life Quality</span>
-          <span>Crafted with Gemini 3.8 Flash • CBT & Growth Mindset</span>
+          <span className="font-medium text-stone-400">
+            BeliefCraft 2.0 • Grounded Self-Belief & Holistic Life Quality
+          </span>
+          <span className="text-stone-500">
+            21st.dev Motion Design System • GSAP & Framer Motion v12
+          </span>
         </div>
       </footer>
     </div>

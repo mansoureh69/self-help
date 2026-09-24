@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import {
   Sparkles,
   ShieldCheck,
@@ -8,16 +9,18 @@ import {
   ArrowRight,
   Quote,
   CheckCircle2,
-  Brain,
   Compass,
-  Trophy,
   Zap,
-  Target
+  TrendingUp,
+  Cpu
 } from 'lucide-react';
 import { TabType } from '../Navigation';
 import { CoachPersona, DailyRitual, EvidenceEntry, LimitingBelief, LifeQualityPillar, LifeQualityCheckpoint } from '../../types';
 import { COACH_PERSONAS, DAILY_WISDOM_QUOTES } from '../../data/initialData';
 import { GrowthTrendsChart } from './GrowthTrendsChart';
+import { GlowCard } from '../ui/GlowCard';
+import { AnimatedCounter } from '../ui/AnimatedCounter';
+import { CONTAINER_VARIANTS, ITEM_VARIANTS, SPRINGS } from '../../styles/tokens';
 
 interface OverviewHomeProps {
   onNavigate: (tab: TabType) => void;
@@ -46,7 +49,6 @@ export const OverviewHome: React.FC<OverviewHomeProps> = ({
 
   const totalScore = pillars.reduce((sum, p) => sum + p.score, 0);
   const lifeQualityPercent = Math.round((totalScore / (pillars.length * 10)) * 100);
-
   const completedRituals = rituals.filter((r) => r.completedToday).length;
 
   const currentQuote = DAILY_WISDOM_QUOTES[quoteIndex % DAILY_WISDOM_QUOTES.length];
@@ -57,214 +59,245 @@ export const OverviewHome: React.FC<OverviewHomeProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-      {/* Daily Mindset Anchor Quote Card */}
-      <div className="bg-gradient-to-r from-stone-900 via-stone-900 to-amber-950/40 border border-stone-800 rounded-3xl p-6 sm:p-8 text-stone-100 shadow-xl relative overflow-hidden">
-        <div className="absolute -right-8 -bottom-8 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+    <motion.div
+      variants={CONTAINER_VARIANTS}
+      initial="hidden"
+      animate="visible"
+      className="max-w-5xl mx-auto px-4 py-8 space-y-7"
+    >
+      {/* 21st.dev Ambient Hero Quote Card */}
+      <motion.div variants={ITEM_VARIANTS}>
+        <GlowCard
+          glowColor="amber"
+          className="p-6 sm:p-8 bg-gradient-to-br from-[#12161f] via-[#0d1017] to-[#15120d] border border-white/[0.09] overflow-hidden"
+        >
+          {/* Subtle Ambient Radial Glow */}
+          <div className="absolute -right-12 -top-12 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400">
-              <Quote className="w-4 h-4" />
-            </span>
-            <span className="text-xs uppercase font-bold tracking-wider text-amber-400">
-              Daily Anchor for Self-Belief
-            </span>
+          <div className="flex items-center justify-between gap-4 mb-4 relative z-10">
+            <div className="flex items-center gap-2">
+              <span className="p-1.5 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                <Quote className="w-3.5 h-3.5" />
+              </span>
+              <span className="text-[11px] uppercase font-bold tracking-widest text-amber-400">
+                Core Mindset Anchor
+              </span>
+            </div>
+
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setQuoteIndex((prev) => prev + 1)}
+              className="text-xs text-stone-400 hover:text-amber-300 font-medium transition-colors flex items-center gap-1"
+            >
+              <span>Next Catalyst</span>
+              <span>→</span>
+            </motion.button>
           </div>
 
-          <button
-            onClick={() => setQuoteIndex((prev) => prev + 1)}
-            className="text-xs text-stone-400 hover:text-amber-300 transition-colors"
-          >
-            Next Insight →
-          </button>
-        </div>
+          <p className="text-base sm:text-xl font-medium font-['Outfit'] text-white italic leading-relaxed max-w-3xl relative z-10">
+            "{currentQuote.quote}"
+          </p>
+          <p className="text-xs text-stone-400 mt-3 font-semibold tracking-wide relative z-10">
+            — {currentQuote.author}
+          </p>
+        </GlowCard>
+      </motion.div>
 
-        <p className="text-base sm:text-xl font-medium font-['Outfit'] text-stone-100 italic leading-relaxed max-w-3xl">
-          "{currentQuote.quote}"
-        </p>
-        <p className="text-xs text-stone-400 mt-2 font-semibold tracking-wide">
-          — {currentQuote.author}
-        </p>
-      </div>
-
-      {/* 4 Core Vital Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Stat 1: Life Quality Index */}
-        <div
+      {/* 4 Core KPI Bento Cards with GSAP Animated Counters */}
+      <motion.div variants={ITEM_VARIANTS} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* KPI 1: Life Quality */}
+        <GlowCard
+          glowColor="amber"
           onClick={() => onNavigate('life-wheel')}
-          className="bg-stone-900 border border-stone-800 hover:border-stone-700 p-5 rounded-2xl cursor-pointer transition-all shadow-md group"
+          className="p-5 cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-stone-400 font-medium">Life Quality</span>
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform">
               <PieChart className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold font-['Outfit'] text-stone-100">
-            {lifeQualityPercent}%
+          <div className="text-2xl sm:text-3xl font-extrabold font-['Outfit'] text-white flex items-baseline gap-1">
+            <AnimatedCounter value={lifeQualityPercent} suffix="%" />
           </div>
           <p className="text-[11px] text-stone-400 mt-1 flex items-center gap-1">
-            <span>6 foundational domains</span>
-            <ArrowRight className="w-3 h-3 text-stone-500 group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all" />
+            <span>6 core domains</span>
+            <ArrowRight className="w-3 h-3 text-stone-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
           </p>
-        </div>
+        </GlowCard>
 
-        {/* Stat 2: Undeniable Proof Logged */}
-        <div
+        {/* KPI 2: Evidence Proof Vault */}
+        <GlowCard
+          glowColor="emerald"
           onClick={() => onNavigate('evidence')}
-          className="bg-stone-900 border border-stone-800 hover:border-stone-700 p-5 rounded-2xl cursor-pointer transition-all shadow-md group"
+          className="p-5 cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-stone-400 font-medium">Proof Vault</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold font-['Outfit'] text-stone-100">
-            {evidence.length}
+          <div className="text-2xl sm:text-3xl font-extrabold font-['Outfit'] text-white flex items-baseline gap-1">
+            <AnimatedCounter value={evidence.length} />
           </div>
           <p className="text-[11px] text-stone-400 mt-1 flex items-center gap-1">
-            <span>Real wins & courage logged</span>
-            <ArrowRight className="w-3 h-3 text-stone-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all" />
+            <span>Wins & proofs logged</span>
+            <ArrowRight className="w-3 h-3 text-stone-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
           </p>
-        </div>
+        </GlowCard>
 
-        {/* Stat 3: Inner Critic Reframes */}
-        <div
+        {/* KPI 3: Inner Critic Reframes */}
+        <GlowCard
+          glowColor="indigo"
           onClick={() => onNavigate('reframer')}
-          className="bg-stone-900 border border-stone-800 hover:border-stone-700 p-5 rounded-2xl cursor-pointer transition-all shadow-md group"
+          className="p-5 cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-stone-400 font-medium">Reframed Beliefs</span>
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs text-stone-400 font-medium">Reframes</span>
+            <div className="w-8 h-8 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center border border-indigo-500/20 group-hover:scale-110 transition-transform">
               <Sparkles className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold font-['Outfit'] text-stone-100">
-            {reframes.length}
+          <div className="text-2xl sm:text-3xl font-extrabold font-['Outfit'] text-white flex items-baseline gap-1">
+            <AnimatedCounter value={reframes.length} />
           </div>
           <p className="text-[11px] text-stone-400 mt-1 flex items-center gap-1">
-            <span>Traps dismantled with CBT</span>
-            <ArrowRight className="w-3 h-3 text-stone-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all" />
+            <span>CBT shifts executed</span>
+            <ArrowRight className="w-3 h-3 text-stone-500 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
           </p>
-        </div>
+        </GlowCard>
 
-        {/* Stat 4: Consistency Streak */}
-        <div
+        {/* KPI 4: Consistency Streak */}
+        <GlowCard
+          glowColor="amber"
           onClick={() => onNavigate('rituals')}
-          className="bg-stone-900 border border-stone-800 hover:border-stone-700 p-5 rounded-2xl cursor-pointer transition-all shadow-md group"
+          className="p-5 cursor-pointer group"
         >
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-stone-400 font-medium">Daily Streak</span>
-            <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Flame className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 transition-transform">
+              <Flame className="w-4 h-4 fill-amber-400/20" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold font-['Outfit'] text-stone-100">
-            {streakCount} Days
+          <div className="text-2xl sm:text-3xl font-extrabold font-['Outfit'] text-white flex items-baseline gap-1">
+            <AnimatedCounter value={streakCount} suffix="d" />
           </div>
           <p className="text-[11px] text-stone-400 mt-1 flex items-center gap-1">
-            <span>{completedRituals}/{rituals.length} anchors done today</span>
-            <ArrowRight className="w-3 h-3 text-stone-500 group-hover:text-orange-400 group-hover:translate-x-0.5 transition-all" />
+            <span>{completedRituals}/{rituals.length} anchors today</span>
+            <ArrowRight className="w-3 h-3 text-stone-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
           </p>
-        </div>
-      </div>
+        </GlowCard>
+      </motion.div>
 
-      {/* Growth Trends Recharts Dashboard */}
-      <GrowthTrendsChart
-        pillars={pillars}
-        checkpoints={checkpoints}
-        onAddCheckpoint={onAddCheckpoint}
-      />
+      {/* Upgraded Growth Trends Recharts Dashboard */}
+      <motion.div variants={ITEM_VARIANTS}>
+        <GrowthTrendsChart
+          pillars={pillars}
+          checkpoints={checkpoints}
+          onAddCheckpoint={onAddCheckpoint}
+        />
+      </motion.div>
 
-      {/* Quick Launchpad: Mindset Mentors & Cognitive Reframer */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left 7 Columns: Meet Your AI Coaches */}
-        <div className="lg:col-span-7 bg-stone-900 border border-stone-800 rounded-2xl p-6 shadow-md flex flex-col justify-between">
+      {/* Bento Bottom Row: AI Coaches & Quick Reframe Action */}
+      <motion.div variants={ITEM_VARIANTS} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left 7 Columns: AI Mindset Mentors Bento */}
+        <GlowCard glowColor="none" className="lg:col-span-7 p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-base font-bold text-stone-100 font-['Outfit'] flex items-center gap-2">
-                  <BotMessageSquare className="w-5 h-5 text-amber-400" />
-                  <span>Your Dedicated Gemini Mindset Mentors</span>
+                <h2 className="text-base font-bold text-white font-['Outfit'] flex items-center gap-2">
+                  <BotMessageSquare className="w-4 h-4 text-amber-400" />
+                  <span>AI Mindset Mentors</span>
                 </h2>
                 <p className="text-xs text-stone-400 mt-0.5">
-                  Multi-turn personalized guidance to reprogram self-doubt and enhance your life balance.
+                  Multi-turn guidance powered by Gemini 3.8 Flash to dismantle doubt.
                 </p>
               </div>
 
-              <button
+              <motion.button
+                whileHover={{ x: 2 }}
                 onClick={() => onNavigate('coach')}
                 className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1"
               >
-                <span>Open Chat</span>
+                <span>Enter Chat</span>
                 <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              </motion.button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {COACH_PERSONAS.map((coach) => (
-                <div
+                <motion.div
                   key={coach.id}
+                  whileHover={{ y: -2, scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => handleStartCoach(coach)}
-                  className="bg-stone-800/50 hover:bg-stone-800 border border-stone-700/60 hover:border-amber-500/60 p-3.5 rounded-xl cursor-pointer transition-all group"
+                  className="bg-[#12161f]/70 hover:bg-[#161c28] border border-white/[0.06] hover:border-amber-500/40 p-3.5 rounded-2xl cursor-pointer transition-all group"
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-stone-100 group-hover:text-amber-300 transition-colors">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-stone-200 group-hover:text-amber-300 transition-colors">
                       {coach.name}
                     </span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-stone-700/80 text-stone-300 font-medium">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-stone-300 font-medium">
                       {coach.badge}
                     </span>
                   </div>
                   <p className="text-[11px] text-stone-400 line-clamp-2 leading-relaxed">
                     {coach.tagline}
                   </p>
-                  <span className="text-[11px] text-amber-400 font-semibold mt-2 inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                    <span>Consult Coach</span> →
+                  <span className="text-[11px] text-amber-400 font-semibold mt-2.5 inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                    <span>Consult Mentor</span> →
                   </span>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-stone-800/80 flex items-center justify-between text-xs text-stone-400">
-            <span>Powered by Gemini 3.8 Flash</span>
-            <span className="text-emerald-400 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Ready to converse
+          <div className="mt-5 pt-3.5 border-t border-white/[0.06] flex items-center justify-between text-xs text-stone-400">
+            <span className="flex items-center gap-1.5">
+              <Cpu className="w-3.5 h-3.5 text-stone-500" />
+              <span>Gemini 3.8 Flash Active</span>
+            </span>
+            <span className="text-emerald-400 flex items-center gap-1.5 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Available for Dialogue</span>
             </span>
           </div>
-        </div>
+        </GlowCard>
 
-        {/* Right 5 Columns: Quick Reframer & Today's Rituals */}
+        {/* Right 5 Columns: Spontaneous Reframe & Today's Anchors */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Quick Limiting Thought Prompt Card */}
-          <div className="bg-gradient-to-br from-amber-950/40 via-stone-900 to-stone-900 border border-amber-900/40 rounded-2xl p-5 shadow-md">
+          {/* Quick Reframe Card */}
+          <GlowCard
+            glowColor="amber"
+            className="p-5 bg-gradient-to-br from-[#1a140d]/80 via-[#10131a] to-[#0c0d10] border border-amber-500/20"
+          >
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4 text-amber-400" />
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400">
                 Spontaneous Reframe
               </span>
             </div>
-            <h3 className="text-sm font-bold text-stone-100 font-['Outfit'] mb-1">
+            <h3 className="text-sm font-bold text-white font-['Outfit'] mb-1">
               Dismantle Inner Critic Traps
             </h3>
             <p className="text-xs text-stone-400 leading-relaxed mb-4">
               Turn cognitive distortions (imposter syndrome, catastrophizing) into grounded self-trust.
             </p>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => onNavigate('reframer')}
-              className="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/30"
+              className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-stone-950 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-amber-950/40"
             >
-              <span>Reframe a Limiting Thought Now</span>
+              <span>Reframe a Thought Now</span>
               <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
+            </motion.button>
+          </GlowCard>
 
           {/* Today's Anchors Preview */}
-          <div className="bg-stone-900 border border-stone-800 rounded-2xl p-5 shadow-md">
+          <GlowCard glowColor="none" className="p-5">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-bold text-stone-200 uppercase tracking-wider flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -272,7 +305,7 @@ export const OverviewHome: React.FC<OverviewHomeProps> = ({
               </h3>
               <button
                 onClick={() => onNavigate('rituals')}
-                className="text-[11px] text-amber-400 hover:text-amber-300"
+                className="text-[11px] text-amber-400 hover:text-amber-300 font-medium"
               >
                 View All
               </button>
@@ -282,20 +315,20 @@ export const OverviewHome: React.FC<OverviewHomeProps> = ({
               {rituals.slice(0, 3).map((r) => (
                 <div
                   key={r.id}
-                  className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded-lg bg-stone-800/40 border border-stone-800 text-stone-300"
+                  className="flex items-center justify-between text-xs py-2 px-3 rounded-xl bg-white/[0.03] border border-white/[0.05] text-stone-300"
                 >
-                  <span className={`truncate mr-2 ${r.completedToday ? 'line-through text-stone-500' : ''}`}>
+                  <span className={`truncate mr-2 ${r.completedToday ? 'line-through text-stone-500' : 'text-stone-200'}`}>
                     {r.title}
                   </span>
-                  <span className="text-[10px] text-amber-400 font-bold whitespace-nowrap">
-                    {r.streak}d streak
+                  <span className="text-[10px] text-amber-400 font-bold whitespace-nowrap bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                    {r.streak}d
                   </span>
                 </div>
               ))}
             </div>
-          </div>
+          </GlowCard>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

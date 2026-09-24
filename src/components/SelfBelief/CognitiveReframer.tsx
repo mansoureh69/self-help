@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Sparkles,
   ArrowRight,
@@ -10,11 +11,12 @@ import {
   Compass,
   Zap,
   Loader2,
-  BookmarkCheck,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
 import { LimitingBelief } from '../../types';
+import { GlowCard } from '../ui/GlowCard';
+import { SPRINGS } from '../../styles/tokens';
 
 interface CognitiveReframerProps {
   reframes: LimitingBelief[];
@@ -100,159 +102,140 @@ export const CognitiveReframer: React.FC<CognitiveReframerProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6">
-      {/* Header Info */}
-      <div className="bg-stone-900 border border-stone-800 rounded-2xl p-6 mb-6 text-stone-100 shadow-md">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                CBT & Growth Mindset
-              </span>
-              <span className="text-xs text-stone-400">Cognitive Restructuring</span>
-            </div>
-            <h1 className="text-xl md:text-2xl font-bold font-['Outfit'] mt-1 text-stone-100">
-              Inner Critic Reframer
-            </h1>
-            <p className="text-xs md:text-sm text-stone-400 mt-1 max-w-2xl">
-              Self-belief is not about suppressing doubts; it is about examining the evidence.
-              Deconstruct automatic negative thoughts and convert them into grounded, empowering truths.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 bg-stone-800/80 px-4 py-2.5 rounded-xl border border-stone-700/80">
-            <BookmarkCheck className="w-5 h-5 text-emerald-400" />
-            <div>
-              <p className="text-xs text-stone-400 font-medium">Reframed Beliefs</p>
-              <p className="text-lg font-bold text-stone-100">{reframes.length} Transformed</p>
-            </div>
-          </div>
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-7">
+      {/* 21st.dev Header Banner */}
+      <GlowCard glowColor="amber" className="p-6 sm:p-7">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/25 flex items-center gap-1">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Cognitive Restructuring</span>
+          </span>
+          <span className="text-xs text-stone-400">CBT Distortion Dismantler</span>
         </div>
-      </div>
 
-      {/* Input Generator Card */}
-      <div className="bg-stone-900 border border-stone-800 rounded-2xl p-6 mb-8 shadow-xl">
-        <h2 className="text-base font-bold text-stone-100 mb-1 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-amber-400" />
-          <span>Capture an Active Limiting Thought</span>
-        </h2>
-        <p className="text-xs text-stone-400 mb-4">
-          What is your inner critic whispering to you right now? Be as raw and candid as you need.
+        <h1 className="text-xl sm:text-2xl font-bold font-['Outfit'] text-white mt-1">
+          Inner Critic Reframer
+        </h1>
+        <p className="text-xs sm:text-sm text-stone-400 mt-1 max-w-2xl leading-relaxed">
+          Self-doubt is rarely truth—it is usually an archaic threat alarm. Deconstruct cognitive
+          traps, ground your nervous system with evidence, and lock in an empowered belief.
         </p>
+      </GlowCard>
 
+      {/* Input Terminal Card */}
+      <div className="rounded-3xl border border-white/[0.08] bg-[#0e1117]/80 backdrop-blur-xl p-6 shadow-xl space-y-5">
         <form onSubmit={handleReframeSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-stone-300 mb-1.5">
-              The Limiting Thought / Self-Doubt:
+            <label className="block text-xs font-bold text-stone-200 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <span>What is your inner critic whispering or shouting?</span>
+              <span className="text-amber-400">*</span>
             </label>
             <textarea
-              id="limiting-thought-input"
+              required
               rows={3}
               value={thoughtInput}
               onChange={(e) => setThoughtInput(e.target.value)}
-              placeholder="e.g., 'I will never be as competent as my peers, I always stumble when it counts...'"
-              className="w-full bg-stone-800 text-stone-100 placeholder-stone-400 border border-stone-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+              placeholder="e.g., 'I am not ready to apply for this role. Everyone will see I am an imposter.'"
+              className="w-full bg-[#080a0f] text-white placeholder-stone-500 border border-white/[0.1] rounded-2xl p-4 text-xs sm:text-sm focus:outline-none focus:border-amber-400 transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-stone-300 mb-1.5">
-              Optional Context / Triggering Situation:
+            <label className="block text-xs font-medium text-stone-400 mb-1.5">
+              Context or Trigger Situation (optional):
             </label>
             <input
               type="text"
-              id="situation-input"
               value={situationInput}
               onChange={(e) => setSituationInput(e.target.value)}
-              placeholder="e.g., 'Upcoming presentation tomorrow morning', 'Saw a rejected application'"
-              className="w-full bg-stone-800 text-stone-100 placeholder-stone-400 border border-stone-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+              placeholder="e.g., 'Upcoming presentation on Friday', 'Saw a peer's promotion on LinkedIn'"
+              className="w-full bg-[#080a0f] text-white placeholder-stone-500 border border-white/[0.1] rounded-2xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-amber-400 transition-colors"
             />
           </div>
 
-          {/* Quick Inspirations */}
+          {/* Quick Preset Pills */}
           <div>
-            <p className="text-[11px] text-stone-400 mb-1.5">Or test with a common cognitive trap:</p>
+            <p className="text-[11px] text-stone-400 mb-2 font-medium">
+              Or explore common self-limiting patterns:
+            </p>
             <div className="flex flex-wrap gap-2">
               {sampleThoughts.map((sample, idx) => (
-                <button
+                <motion.button
                   key={idx}
                   type="button"
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => setThoughtInput(sample)}
-                  className="text-xs bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700 rounded-lg px-2.5 py-1 text-left transition-colors"
+                  className="text-[11px] text-stone-300 hover:text-white bg-[#141824] hover:bg-[#1a2030] border border-white/[0.06] hover:border-amber-500/30 rounded-full px-3 py-1 text-left transition-colors"
                 >
-                  "{sample.slice(0, 42)}..."
-                </button>
+                  "{sample}"
+                </motion.button>
               ))}
             </div>
           </div>
 
           {errorMsg && (
-            <div className="p-3 bg-rose-950/40 border border-rose-800/80 rounded-xl text-xs text-rose-300 flex items-center gap-2">
+            <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-xl text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
-          <div className="flex justify-end pt-2">
-            <button
+          <div className="pt-2 flex justify-end">
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
-              id="submit-reframe-btn"
-              disabled={!thoughtInput.trim() || isAnalyzing}
-              className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-sm rounded-xl flex items-center gap-2 transition-all shadow-md shadow-amber-950/40 disabled:opacity-50"
+              disabled={isAnalyzing || !thoughtInput.trim()}
+              className="py-3 px-6 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 disabled:opacity-50 text-stone-950 font-bold text-xs sm:text-sm rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-amber-950/40"
             >
               {isAnalyzing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Restructuring with Gemini CBT...</span>
+                  <span>Dismantling Distortion with Gemini...</span>
                 </>
               ) : (
                 <>
-                  <span>Transform into Empowered Belief</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <Sparkles className="w-4 h-4" />
+                  <span>Reframe Thought with Cognitive Science</span>
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
         </form>
       </div>
 
-      {/* Reframed Beliefs Library */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-bold text-stone-100 flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            <span>Your Transformed Belief Library</span>
+      {/* History of Reframed Beliefs */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold text-stone-200 uppercase tracking-wider flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <span>Reframed Belief Ledger ({reframes.length})</span>
           </h2>
-          <span className="text-xs text-stone-400">
-            Click any entry to view counter-evidence and micro-actions
-          </span>
+          <span className="text-xs text-stone-500">Tap to review cognitive blueprint</span>
         </div>
 
         {reframes.length === 0 ? (
-          <div className="bg-stone-900 border border-dashed border-stone-800 rounded-2xl p-8 text-center text-stone-400">
-            <HelpCircle className="w-8 h-8 mx-auto mb-2 text-stone-500" />
-            <p className="text-sm font-medium text-stone-300">No reframed thoughts yet.</p>
-            <p className="text-xs mt-1">
-              Submit a limiting thought above to dismantle your inner critic with psychological evidence.
-            </p>
+          <div className="rounded-3xl border border-dashed border-white/[0.1] p-8 text-center text-stone-400 text-xs">
+            <p className="font-semibold text-stone-300 mb-1">Your reframe ledger is waiting</p>
+            <p>Input any critical voice or self-limiting story above to construct grounded self-trust.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {reframes.map((item) => {
               const isExpanded = expandedId === item.id;
               return (
                 <div
                   key={item.id}
-                  className="bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden transition-all shadow-md hover:border-stone-700"
+                  className="rounded-2xl border border-white/[0.08] bg-[#0e1117]/90 overflow-hidden transition-colors"
                 >
-                  {/* Header Row */}
+                  {/* Summary Bar */}
                   <div
                     className="p-4 sm:p-5 flex items-start justify-between gap-4 cursor-pointer select-none"
                     onClick={() => setExpandedId(isExpanded ? null : item.id)}
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                        <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-950/60 text-rose-300 border border-rose-900/60">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/25">
                           Trap: {item.identifiedTrap}
                         </span>
                         {item.situation && (
@@ -260,17 +243,17 @@ export const CognitiveReframer: React.FC<CognitiveReframerProps> = ({
                             Context: {item.situation}
                           </span>
                         )}
-                        <span className="text-[11px] text-stone-400 ml-auto">
+                        <span className="text-[11px] text-stone-500 ml-auto">
                           {item.createdAt}
                         </span>
                       </div>
 
-                      {/* Original Limiting Thought */}
-                      <p className="text-xs text-stone-400 line-through decoration-rose-500/70 mb-1">
+                      {/* Original Thought */}
+                      <p className="text-xs text-stone-400 line-through decoration-rose-500/60 mb-1">
                         "{item.originalThought}"
                       </p>
 
-                      {/* Empowered Reframe Preview */}
+                      {/* Empowered Reframe */}
                       <p className="text-sm font-semibold text-amber-300 flex items-center gap-1.5">
                         <Zap className="w-4 h-4 text-amber-400 flex-shrink-0" />
                         <span>{item.empoweredReframe}</span>
@@ -278,72 +261,81 @@ export const CognitiveReframer: React.FC<CognitiveReframerProps> = ({
                     </div>
 
                     <button
-                      className="p-1 text-stone-400 hover:text-stone-200"
+                      className="p-1 text-stone-400 hover:text-white"
                       aria-label="Toggle details"
                     >
                       {isExpanded ? (
-                        <ChevronUp className="w-5 h-5" />
+                        <ChevronUp className="w-4 h-4" />
                       ) : (
-                        <ChevronDown className="w-5 h-5" />
+                        <ChevronDown className="w-4 h-4" />
                       )}
                     </button>
                   </div>
 
-                  {/* Expanded Breakdown */}
-                  {isExpanded && (
-                    <div className="px-5 pb-5 pt-2 border-t border-stone-800 space-y-4 bg-stone-950/40 text-xs">
-                      {/* Compassionate Validation */}
-                      <div className="p-3 bg-stone-900/80 rounded-xl border border-stone-800">
-                        <p className="font-semibold text-stone-300 mb-1 flex items-center gap-1.5">
-                          <Compass className="w-3.5 h-3.5 text-blue-400" />
-                          <span>Why Your Brain Created This Thought:</span>
-                        </p>
-                        <p className="text-stone-400 leading-relaxed">
-                          {item.compassionateValidation}
-                        </p>
-                      </div>
-
-                      {/* Counter-Evidence Questions */}
-                      <div>
-                        <p className="font-semibold text-stone-300 mb-2 flex items-center gap-1.5">
-                          <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
-                          <span>Questions to Ground You in Reality:</span>
-                        </p>
-                        <ul className="space-y-1.5 pl-4 list-disc text-stone-300">
-                          {item.counterEvidenceQuestions.map((q, idx) => (
-                            <li key={idx} className="leading-relaxed">
-                              {q}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Micro Action Step with Checkbox */}
-                      <div className="p-3.5 bg-amber-950/30 border border-amber-800/50 rounded-xl flex items-start justify-between gap-3">
-                        <div className="flex-1">
-                          <p className="font-bold text-amber-300 flex items-center gap-1.5 mb-1">
-                            <Clock className="w-3.5 h-3.5 text-amber-400" />
-                            <span>3-Minute Micro-Proof Action:</span>
+                  {/* Expanded Breakdown with AnimatePresence */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={SPRINGS.gentle}
+                        className="px-5 pb-5 pt-2 border-t border-white/[0.06] space-y-4 bg-[#0a0c12]/60 text-xs overflow-hidden"
+                      >
+                        {/* Compassionate Validation */}
+                        <div className="p-3.5 bg-[#121622]/80 rounded-2xl border border-white/[0.06]">
+                          <p className="font-semibold text-stone-200 mb-1 flex items-center gap-1.5">
+                            <Compass className="w-3.5 h-3.5 text-blue-400" />
+                            <span>Why Your Brain Created This Thought:</span>
                           </p>
-                          <p className="text-stone-300 leading-relaxed">
-                            {item.microActionStep}
+                          <p className="text-stone-400 leading-relaxed">
+                            {item.compassionateValidation}
                           </p>
                         </div>
 
-                        <button
-                          onClick={() => onToggleAction(item.id)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                            item.actionCompleted
-                              ? 'bg-emerald-600 text-stone-950'
-                              : 'bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700'
-                          }`}
-                        >
-                          <CheckCircle2 className="w-4 h-4" />
-                          <span>{item.actionCompleted ? 'Completed!' : 'Mark Done'}</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                        {/* Counter-Evidence Questions */}
+                        <div>
+                          <p className="font-semibold text-stone-200 mb-2 flex items-center gap-1.5">
+                            <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+                            <span>Questions to Ground You in Reality:</span>
+                          </p>
+                          <ul className="space-y-1.5 pl-4 list-disc text-stone-300">
+                            {item.counterEvidenceQuestions.map((q, idx) => (
+                              <li key={idx} className="leading-relaxed">
+                                {q}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        {/* Micro Action Step with Checkbox */}
+                        <div className="p-3.5 bg-[#19150e]/80 border border-amber-500/25 rounded-2xl flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <p className="font-bold text-amber-300 flex items-center gap-1.5 mb-1">
+                              <Clock className="w-3.5 h-3.5 text-amber-400" />
+                              <span>3-Minute Micro-Proof Action:</span>
+                            </p>
+                            <p className="text-stone-300 leading-relaxed">
+                              {item.microActionStep}
+                            </p>
+                          </div>
+
+                          <motion.button
+                            whileTap={{ scale: 0.94 }}
+                            onClick={() => onToggleAction(item.id)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                              item.actionCompleted
+                                ? 'bg-emerald-500 text-stone-950 font-bold shadow-md shadow-emerald-500/20'
+                                : 'bg-[#1e2333] hover:bg-[#282f44] text-stone-300 border border-white/[0.08]'
+                            }`}
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span>{item.actionCompleted ? 'Completed!' : 'Mark Done'}</span>
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
